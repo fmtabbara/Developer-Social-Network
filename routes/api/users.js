@@ -8,6 +8,7 @@ const passport = require('passport');
 
 //Load Input Validation
 const validateRegistrationInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 //Load User Model
 const User = require('../../models/User');
@@ -25,6 +26,7 @@ router.get('/register', (req, res) => res.json({ msg: 'Register Works' }));
 router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegistrationInput(req.body);
   // Check Validation
+
   if (!isValid) {
     return res.status(400).json(errors);
   }
@@ -66,6 +68,11 @@ router.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  const { errors, isValid } = validateLoginInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
   //Find User by email
   User.findOne({ email }).then(user => {
     //Check for user
@@ -83,7 +90,7 @@ router.post('/login', (req, res) => {
         jwt.sign(
           payload,
           keys.secretOrKey,
-          { expiresIn: 3600 },
+          { expiresIn: 21600 },
           (err, token) => {
             res.json({ success: true, token: 'Bearer ' + token });
           }
